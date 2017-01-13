@@ -3,6 +3,7 @@
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
+    Serial.begin(9600);
 }
 
 void loop() {
@@ -12,10 +13,6 @@ void loop() {
 
  while( true )
  {
-     if ( theWeatherStation->get_wind_speed() > 1 )
-        digitalWrite(LED_BUILTIN, HIGH);
-     else
-        digitalWrite(LED_BUILTIN, LOW);
-        
+     
  }
 }

@@ -42,7 +42,8 @@ class weatherStation
 	  int averageAnalogRead(int);
 
 	  static bool led;	
-	  static volatile unsigned long windSpeed, rainLevel, lastWindIRQ, lastRainIRQ;
+	  static volatile unsigned long rainLevel, lastWindIRQ, lastRainIRQ;
+    static volatile float windSpeed;
 
 	  MPL3115A2 myPressure;   //Create an instance of the pressure sensor
 	  HTU21D myHumidity;      //Create an instance of the humidity sensor

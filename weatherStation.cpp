@@ -1,10 +1,10 @@
 #include "weatherStation.h"
 
 bool weatherStation::led = 1;
-volatile unsigned long weatherStation::windSpeed = 1;
-volatile unsigned long weatherStation::rainLevel = 1;
-volatile unsigned long weatherStation::lastWindIRQ = 1;
-volatile unsigned long weatherStation::lastRainIRQ = 1;
+volatile float weatherStation::windSpeed = 0;
+volatile unsigned long weatherStation::rainLevel = 0;
+volatile unsigned long weatherStation::lastWindIRQ = 0;
+volatile unsigned long weatherStation::lastRainIRQ = 0;
 
 //**** weatherStation() ***********************************//
 //
@@ -66,16 +66,21 @@ void weatherStation::rainIRQ()
 //*********************************************************//
 void weatherStation::wspeedIRQ()
 {
-  float currentWindIRQ = millis();
+  long currentWindIRQ = millis();
 
   // Ignore switch-bounce glitches less than 10ms (142MPH max reading) after the reed switch closes
-  if (currentWindIRQ - lastWindIRQ > 10)    
+  if ( currentWindIRQ - lastWindIRQ > 10 ) 
   {
-     led = !led;
-    digitalWrite(STAT1, led);
-    // The wind speed is the time since the last click devided by 1.492 mph and 
-    //then multiplied by 1000ms. There is 1.492MPH for each click per second.
-    windSpeed = ( currentWindIRQ - lastWindIRQ ) / 1.492 * 1000; 
+    if ( currentWindIRQ - lastWindIRQ < 3000 ) 
+    {
+       led = !led;
+       digitalWrite(STAT1, led);
+       // The wind speed is the time since the last click devided by 1.492 mph and 
+       //then multiplied by 1000ms. There is 1.492MPH for each click per second.
+       //windSpeed = ( currentWindIRQ - lastWindIRQ ) / 1.492 * 1000; 
+       //windSpeed = (float)( currentWindIRQ - lastWindIRQ ) * 1000.0;
+       windSpeed = 1000.0 / (float)( currentWindIRQ - lastWindIRQ ) * 1.492;
+    }
     lastWindIRQ = millis();                                           
   }
 }
@@ -129,7 +134,7 @@ float weatherStation::get_wind_speed()
 
   // If there have been no clicks for 2 at least 2 seconds.
   //then the wind is just zero.
-  if( millis() - lastWindIRQ > 2000 )
+  if( millis() - lastWindIRQ > 3000 )
     return 0; 
 
   // Return the last calculated wind speed.
