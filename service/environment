@@ -1,0 +1,30 @@
+#!/bin/bash
+# /etc/init.d/environment
+
+### BEGIN INIT INFO
+# Provides:          Environment Service
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This service is used to record environment measurements.
+### END INIT INFO
+
+
+case "$1" in
+    start)
+        echo "Starting environment service"
+        python /usr/bin/environment.py
+        ;;
+    stop)
+        echo "Stopping environment service"
+        killall environment
+        ;;
+    *)
+        echo "Usage: /etc/init.d/servod start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0

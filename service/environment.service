@@ -1,0 +1,16 @@
+[Unit]
+Description=Environment Service
+After=syslog.target network.target
+
+[Service]
+User=pi
+Group=pi
+
+Type=simple
+ExecStart=/usr/bin/python /usr/bin/environment.py
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
