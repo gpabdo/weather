@@ -2,7 +2,8 @@
 
 bool weatherStation::led = 1;
 volatile float weatherStation::windSpeed = 0;
-volatile unsigned long weatherStation::rainLevel = 0;
+volatile float weatherStation::rainLevel = 0;
+volatile float weatherStation::gust = 0;
 volatile unsigned long weatherStation::lastWindIRQ = 0;
 volatile unsigned long weatherStation::lastRainIRQ = 0;
 
@@ -25,7 +26,7 @@ weatherStation::weatherStation()
   //Configure the pressure sensor
   myPressure.begin();                 // Get sensor online
   myPressure.setModeBarometer();      // Measure pressure in Pascals from 20 to 110 kPa
-  myPressure.setOversampleRate(128);  // Set Oversample to the recommended 128
+  myPressure.setOversampleRate(7);    // Set Oversample to the recommended 128
   myPressure.enableEventFlags();      // Enable all three pressure and temp event flags
   myPressure.setModeActive();         // Go to active mode and start measuring!
 
@@ -33,7 +34,8 @@ weatherStation::weatherStation()
   myHumidity.begin();
 
   // attach external interrupt pins to IRQ functions
-  attachInterrupt(RAIN, static_cast<void (*)()>(&rainIRQ), FALLING);
+  // The uno is f-ed, pin 2 is int 0 and pin 3 is int 1.
+  attachInterrupt(0, static_cast<void (*)()>(&rainIRQ), FALLING);
   attachInterrupt(1, static_cast<void (*)()>(&wspeedIRQ), FALLING);
 
   // turn on interrupts
@@ -49,10 +51,10 @@ weatherStation::weatherStation()
 //*********************************************************//
 void weatherStation::rainIRQ()
 {
-  float currentRainIRQ = millis();
+  long currentRainIRQ = millis();
 
-  // ignore switch-bounce glitches less than 10mS after initial edge
-  if (currentRainIRQ - lastRainIRQ > 10)  
+  // ignore switch-bounce glitches less than 100mS after initial edge
+  if (currentRainIRQ - lastRainIRQ > 100)  
   {
     rainLevel += 0.011;                   //Each dump is 0.011" of water
     lastRainIRQ = millis();
@@ -71,52 +73,25 @@ void weatherStation::wspeedIRQ()
   // Ignore switch-bounce glitches less than 10ms (142MPH max reading) after the reed switch closes
   if ( currentWindIRQ - lastWindIRQ > 10 ) 
   {
-    if ( currentWindIRQ - lastWindIRQ < 3000 ) 
-    {
-       led = !led;
-       digitalWrite(STAT1, led);
-       // The wind speed is the time since the last click devided by 1.492 mph and 
-       //then multiplied by 1000ms. There is 1.492MPH for each click per second.
-       //windSpeed = ( currentWindIRQ - lastWindIRQ ) / 1.492 * 1000; 
-       //windSpeed = (float)( currentWindIRQ - lastWindIRQ ) * 1000.0;
-       windSpeed = 1000.0 / (float)( currentWindIRQ - lastWindIRQ ) * 1.492;
-    }
+    led = !led;
+    digitalWrite(STAT1, led);
+    // The wind speed is the time since the last click devided by 1.492 mph and 
+    //then multiplied by 1000ms. There is 1.492MPH for each click per second.
+    windSpeed = 1000.0 / (float)( currentWindIRQ - lastWindIRQ ) * 1.492;
+
+    if( windSpeed > gust )
+        gust = windSpeed;
+           
     lastWindIRQ = millis();                                           
   }
 }
 
 
-//**** get_light_level() **********************************//
-// Returns the voltage of the light sensor based on the 3.3V 
-// rail.
-// This allows us to ignore what VCC might be (an Arduino 
-// plugged into USB has VCC of 4.5 to 5.2V)
-//*********************************************************//
-float weatherStation::get_light_level()
-{
- /* float operatingVoltage = averageAnalogRead(REFERENCE_3V3);
-
-  float lightSensor = averageAnalogRead(LIGHT);
-
-  operatingVoltage = 3.3 / operatingVoltage; //The reference voltage is 3.3V
-
-  lightSensor *= operatingVoltage;
-
-  return(lightSensor); */
-  return( 0 );
-}
-
-
-//**** get_rain_level() ***********************************//
+//**** getRain() ******************************************//
 // Returns the amount of rain since last checked.
 //*********************************************************//
-float weatherStation::get_rain_level()
+float weatherStation::getRain()
 {
-  // If rainLevel is 0, don't do a reset just incase
-  //we get interrupted right here for a rain dump.
-  if( rainLevel == 0)
-    return 0;
-
   // There has been some rain since last checked, 
   //return the ammount in inches.
   float rainValue = rainLevel;
@@ -126,26 +101,37 @@ float weatherStation::get_rain_level()
 }
 
 
-//**** get_wind_speed() ***********************************//
+//**** getWindSpeed() *************************************//
 // Returns the instataneous wind speed
 //*********************************************************//
-float weatherStation::get_wind_speed()
+float weatherStation::getWindSpeed()
 {
 
-  // If there have been no clicks for 2 at least 2 seconds.
-  //then the wind is just zero.
+  // If there have been no clicks for at least 3 seconds,
+  // there is no wind.
   if( millis() - lastWindIRQ > 3000 )
-    return 0; 
+     windSpeed = 0;
 
   // Return the last calculated wind speed.
   return(windSpeed);
 }
 
 
-//**** get_wind_direction() *******************************//
+//**** getWindGust() **************************************//
+// Returns the instataneous wind speed
+//*********************************************************//
+float weatherStation::getWindGust()
+{
+    float lastGust = gust;
+    gust = 0;
+    return lastGust;
+}
+
+
+//**** getWindDirection() *********************************//
 // Read the wind direction sensor, return heading in degrees 
 //*********************************************************//
-int weatherStation::get_wind_direction()
+int weatherStation::getWindDirection()
 {
   unsigned int adc = averageAnalogRead(WDIR);   // get the current reading from the sensor
 
@@ -192,13 +178,32 @@ float weatherStation::getTemp()
 
 
 //**** getPressure() **************************************//
-//
+// Return pressure in millibars.
 //*********************************************************//
 float weatherStation::getPressure()
 {
-    return( myPressure.readPressure() );
+    return( myPressure.readPressure() / 100.0 );
 }
 
+
+//**** getLightLevel() ************************************//
+// Returns the voltage of the light sensor based on the 3.3V 
+// rail.
+// This allows us to ignore what VCC might be (an Arduino 
+// plugged into USB has VCC of 4.5 to 5.2V)
+//*********************************************************//
+float weatherStation::getLightLevel()
+{
+  float operatingVoltage = averageAnalogRead(REFERENCE_3V3);
+
+  float lightSensor = averageAnalogRead(LIGHT);
+
+  operatingVoltage = 3.3 / operatingVoltage; //The reference voltage is 3.3V
+
+  lightSensor *= operatingVoltage;
+
+  return(lightSensor);
+}
 
 //**** get_battery_level() ********************************//
 // Returns the voltage of the raw pin based on the 3.3V rail
@@ -209,7 +214,7 @@ float weatherStation::getPressure()
 // through two 5% resistors and connected to A2 (BATT):
 // 3.9K on the high side (R1), and 1K on the low side (R2)
 //*********************************************************//
-float weatherStation::get_battery_level()
+float weatherStation::getBatteryLevel()
 {
   float operatingVoltage = averageAnalogRead(REFERENCE_3V3);
 

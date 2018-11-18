@@ -1,12 +1,12 @@
 #ifndef WeatherStation_h
 #define WeatherStation_h
 
-#include <avr/wdt.h>            //We need watch dog for this program
-#include <Wire.h>               //I2C needed for sensors
-#include <SparkFunMPL3115A2.h>  //Pressure sensor
-#include <SparkFunHTU21D.h>     //Humidity sensor
-//#include "AS3935.h"             //Lighting dtector
-//#include <SPI.h>                //Needed for lighting sensor
+#include <avr/wdt.h>                //We need watch dog for this program
+#include <Wire.h>                   //I2C needed for sensors
+#include <SparkFunMPL3115A2.h>      //Pressure sensor
+#include <SparkFunHTU21D.h>         //Humidity sensor
+//#include "AS3935.h"               //Lighting dtector
+//#include <SPI.h>                  //Needed for lighting sensor
 
 #define WSPEED 3
 #define RAIN 2
@@ -26,14 +26,15 @@ class weatherStation
 
   public:
   	weatherStation();
- 	  float get_light_level();
- 	  float get_rain_level();
- 	  float get_wind_speed();
- 	  int get_wind_direction();
- 	  float get_battery_level();
+ 	  float getRain();
+ 	  float getWindSpeed();
+    float getWindGust();
+ 	  int getWindDirection();
+ 	  float getBatteryLevel();
  	  float getHumidity();
  	  float getTemp();
  	  float getPressure();
+    float getLightLevel();
 
 
   private:
@@ -42,8 +43,8 @@ class weatherStation
 	  int averageAnalogRead(int);
 
 	  static bool led;	
-	  static volatile unsigned long rainLevel, lastWindIRQ, lastRainIRQ;
-    static volatile float windSpeed;
+	  static volatile unsigned long lastWindIRQ, lastRainIRQ;
+    static volatile float windSpeed, rainLevel, gust;
 
 	  MPL3115A2 myPressure;   //Create an instance of the pressure sensor
 	  HTU21D myHumidity;      //Create an instance of the humidity sensor
