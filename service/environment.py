@@ -37,7 +37,7 @@ while( True ):
      continue
 
    event["site"] = "Pad"
-   event["location"] = "Bedroom"
+   event["location"] = "Livingroom"
    
    producer.send('environment', event)
 
