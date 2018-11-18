@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7 
 
 import sys
 import argparse 
@@ -8,13 +8,6 @@ import requests
 from arduinoCommunication import arduinoSerial
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
-
-#
-# Oh where is the ardunio?
-#
-arduino = arduinoSerial()
-
-producer = KafkaProducer(bootstrap_servers=['kafka.pad.the-collective-group.com:9092'], value_serializer=lambda v: json.dumps(v).encode('ascii'))
 
 
 ## ----------------------------------------- ##
@@ -31,15 +24,24 @@ def main(argv):
                     required=True,
                     dest="location",
                     help="Room the weatherstatoin is in" )
- 
+  
+  parser.add_argument('-k', '--kafka',
+                    required=False,
+                    dest="kafka",
+                    help="Kafka bootstrap servers" )
+
   args = parser.parse_args()
-  collect( site=args.site, location=args.location )
+  collect( site=args.site, location=args.location, kafka=args.kafka )
 
 
 ## ----------------------------------------- ## 
 #
 ## ----------------------------------------- ## 
-def collect( site="default", location="default" ):
+def collect( site="default", location="default", kafka='kafka.pad.the-collective-group.com:9092' ):
+
+  arduino = arduinoSerial()
+  producer = KafkaProducer(bootstrap_servers=[kafka], value_serializer=lambda v: json.dumps(v).encode('ascii'))
+
   print "Starting loop"
   while( True ):
 
