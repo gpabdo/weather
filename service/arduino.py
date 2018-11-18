@@ -14,7 +14,7 @@ class arduinoSerial:
   ## ------------------------- ##
   #
   ## ------------------------- ##
-  def __init__(self, device='/dev/ttyUSB0', serial_speed=115200):
+  def __init__(self, device='/dev/ttyUSB0', serial_speed=57600):
     self.arduino = serial.Serial(device, serial_speed)
     self.status = True
     time.sleep(3)
