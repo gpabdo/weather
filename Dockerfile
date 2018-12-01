@@ -1,7 +1,9 @@
 FROM python:2.7
 
 ENV SITE='unkown'
-ENV LOCATOIN='unknown'
+ENV LOCATION='unknown'
+ENV KAFKA='kafka.pad.the-collective-group.com:9092'
+ENV DEVICE='/host/ttyUSB0'
 
 COPY ./environment/requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt 
@@ -13,4 +15,3 @@ WORKDIR /app
 COPY ./environment/environment.py /app/environment.py
 
 ENTRYPOINT ["/usr/local/bin/python", "/app/environment.py"]
-CMD ["-s", "$SITE", "-l", "$LOCATION"]

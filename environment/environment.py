@@ -1,5 +1,6 @@
 #!/usr/bin/python2.7 
 
+import os
 import sys
 import argparse 
 import json
@@ -13,33 +14,40 @@ from kafka.errors import KafkaError
 #
 ## ----------------------------------------- ##
 def main(argv):
-  parser = argparse.ArgumentParser()
-  parser.add_argument('-s', '--site',
-                    required=True,
-                    dest="site",
-                    help="Geographic site of the weatherstation" )
+    try:  
+           site = os.environ["SITE"]
+    except KeyError: 
+           print "Please set the environment variable SITE"
+           sys.exit(1)
 
-  parser.add_argument('-l', '--location',
-                    required=True,
-                    dest="location",
-                    help="Room the weatherstatoin is in" )
-  
-  parser.add_argument('-k', '--kafka',
-                    required=False,
-                    default='kafka.pad.the-collective-group.com:9092',
-                    dest="kafka",
-                    help="Kafka bootstrap servers" )
+    try:  
+           location = os.environ["LOCATION"]
+    except KeyError: 
+           print "Please set the environment variable LOCATION"
+           sys.exit(1)
 
-  args = parser.parse_args()
-  collect( site=args.site, location=args.location, kafka=args.kafka )
+    try:  
+           kafka = os.environ["KAFKA"]
+    except KeyError: 
+           print "Please set the environment variable KAFKA"
+           sys.exit(1)
+
+    try:  
+           device = os.environ["DEVICE"]
+    except KeyError: 
+           print "Please set the environment variable DEVICE"
+           sys.exit(1)
+
+    
+    collect( site=site, location=location, kafka=kafka, device=device )
 
 
 ## ----------------------------------------- ## 
 #
 ## ----------------------------------------- ## 
-def collect( site, location, kafka ):
+def collect( site, location, kafka, device ):
 
-  arduino = arduinoSerial( device='/host/ttyUSB0' )
+  arduino = arduinoSerial( device=device )
   producer = KafkaProducer(bootstrap_servers=[kafka], value_serializer=lambda v: json.dumps(v).encode('ascii'))
 
   print "Starting loop"
