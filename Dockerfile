@@ -13,4 +13,4 @@ WORKDIR /app
 COPY ./environment/environment.py /app/environment.py
 
 ENTRYPOINT ["/usr/local/bin/python", "/app/environment.py"]
-CMD ["-s", "SITE", "-l", "LOCATION"]
+CMD ["-s", "$SITE", "-l", "$LOCATION"]

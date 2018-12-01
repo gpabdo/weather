@@ -39,7 +39,7 @@ def main(argv):
 ## ----------------------------------------- ## 
 def collect( site, location, kafka ):
 
-  arduino = arduinoSerial()
+  arduino = arduinoSerial( device='/host/ttyUSB0' )
   producer = KafkaProducer(bootstrap_servers=[kafka], value_serializer=lambda v: json.dumps(v).encode('ascii'))
 
   print "Starting loop"
