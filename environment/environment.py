@@ -4,7 +4,6 @@ import sys
 import argparse 
 import json
 import time
-import requests
 from arduinoCommunication import arduinoSerial
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
@@ -27,6 +26,7 @@ def main(argv):
   
   parser.add_argument('-k', '--kafka',
                     required=False,
+                    default='kafka.pad.the-collective-group.com:9092',
                     dest="kafka",
                     help="Kafka bootstrap servers" )
 
@@ -37,7 +37,7 @@ def main(argv):
 ## ----------------------------------------- ## 
 #
 ## ----------------------------------------- ## 
-def collect( site="default", location="default", kafka='kafka.pad.the-collective-group.com:9092' ):
+def collect( site, location, kafka ):
 
   arduino = arduinoSerial()
   producer = KafkaProducer(bootstrap_servers=[kafka], value_serializer=lambda v: json.dumps(v).encode('ascii'))

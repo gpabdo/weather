@@ -1,11 +1,16 @@
-FROM ubuntu:16.04
+FROM python:2.7
 
-ENV PACKAGE_NAME environment
-ENV PACKAGE_VERSION 0.1
+ENV SITE='unkown'
+ENV LOCATOIN='unknown'
 
-RUN apt-get update
-RUN apt-get install -y ruby-dev build-essential
+COPY ./environment/requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt 
 
-RUN gem install fpm
+COPY ./environment/arduinoCommunication /usr/local/lib/python2.7/site-packages/arduinoCommunication
 
-ENTRYPOINT fpm -s dir --package /package/environment.deb -v ${PACKAGE_VERSION} -t deb -n ${PACKAGE_NAME} /package/environment/environment.py=/usr/bin/environment.py /package/environment/environment.conf=/etc/environment.conf /package/service/environment.service=/etc/systemd/system/
+RUN mkdir /app
+WORKDIR /app
+COPY ./environment/environment.py /app/environment.py
+
+ENTRYPOINT ["/usr/local/bin/python", "/app/environment.py"]
+CMD ["-s", "SITE", "-l", "LOCATION"]
