@@ -20,6 +20,15 @@ $ sudo apt-get install -y docker-ce
 # Launch the weather docker
 ```
 $ echo "LOCATION=Bedroom" >> ~/.bashrc
+$ echo "SITE=pad" >> ~/.bashrc
 $ . ./.bashrc
-$ docker run -d --restart always --name weather -v /dev/:/host/ -e LOCATION=$LOCATION -e DEVICE=/host/ttyACM0 -e SITE=pad --privileged eventngine/environment:arm-0.0.1
+$ docker run -d \
+     --restart always \
+     --name weather \
+     -v /dev/:/host/ \
+     -e LOCATION=$LOCATION \
+     -e SITE=$SITE \
+     -e DEVICE=/host/ttyACM0 \
+     --privileged \
+     eventngine/environment:arm-0.0.1
 ```
