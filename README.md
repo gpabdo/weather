@@ -15,6 +15,8 @@ $ echo "deb [arch=armhf] https://download.docker.com/linux/debian \
 $ sudo apt-get update
 
 $ sudo apt-get install -y docker-ce
+
+$ sudo usermod -aG docker $USER
 ```
 
 # Launch the weather docker
