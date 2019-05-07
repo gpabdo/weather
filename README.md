@@ -1,10 +1,17 @@
+# Build
+```
+$ docker build -t eventngine/environment:arm-0.0.2 .
+$ docker push eventngine/environment:arm-0.0.2
+```
+
 # Install docker
 ```
 $ sudo apt-get install -y\
     apt-transport-https \
     ca-certificates \
     curl \
-    software-properties-common
+    software-properties-common \
+    git
 
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -31,6 +38,7 @@ $ docker run -d \
      -e LOCATION=$LOCATION \
      -e SITE=$SITE \
      -e DEVICE=/host/ttyACM0 \
+     -e API_URL=http://environment.the-collective-group.com \
      --privileged \
-     eventngine/environment:arm-0.0.1
+     eventngine/environment:arm-0.0.2
 ```
