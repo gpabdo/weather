@@ -1,10 +1,17 @@
+# Build
+```
+$ docker build -t eventngine/environment:arm-0.0.2 .
+$ docker push eventngine/environment:arm-0.0.2
+```
+
 # Install docker
 ```
 $ sudo apt-get install -y\
     apt-transport-https \
     ca-certificates \
     curl \
-    software-properties-common
+    software-properties-common \
+    git
 
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -15,6 +22,8 @@ $ echo "deb [arch=armhf] https://download.docker.com/linux/debian \
 $ sudo apt-get update
 
 $ sudo apt-get install -y docker-ce
+
+$ sudo usermod -aG docker pi
 ```
 
 # Launch the weather docker
