@@ -30,5 +30,5 @@ $ sudo usermod -aG docker pi
 ```
 $ echo "LOCATION=Bedroom" >> ~/.bashrc
 $ . ./.bashrc
-$ docker run -d --restart always --name weather -v /dev/:/host/ -e LOCATION=$LOCATION -e DEVICE=/host/ttyACM0 -e SITE=pad --privileged eventngine/environment:arm-0.0.1
+$ docker run -d --restart always --name weather -v /dev/:/host/ -e LOCATION=$LOCATION -e DEVICE=/host/ttyACM0 -e API_URL=http://environment.the-collective-group.com -e SITE=$SITE --privileged eventngine/environment:arm-0.0.2 
 ```
