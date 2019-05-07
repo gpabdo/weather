@@ -14,4 +14,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY ./environment/environment.py /app/environment.py
 
-ENTRYPOINT ["/usr/local/bin/python", "/app/environment.py"]
+ENTRYPOINT ["/usr/local/bin/python", "-u", "/app/environment.py"]
