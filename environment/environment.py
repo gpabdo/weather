@@ -6,9 +6,7 @@ import argparse
 import json
 import time
 from arduinoCommunication import arduinoSerial
-from kafka import KafkaProducer
-from kafka.errors import KafkaError
-
+import requests 
 
 ## ----------------------------------------- ##
 #
@@ -27,9 +25,9 @@ def main(argv):
            sys.exit(1)
 
     try:  
-           kafka = os.environ["KAFKA"]
+           api_url = os.environ["API_URL"]
     except KeyError: 
-           print "Please set the environment variable KAFKA"
+           print "Please set the environment variable API_URL"
            sys.exit(1)
 
     try:  
@@ -39,16 +37,15 @@ def main(argv):
            sys.exit(1)
 
     
-    collect( site=site, location=location, kafka=kafka, device=device )
+    collect( site=site, location=location, api_url=api_url, device=device )
 
 
 ## ----------------------------------------- ## 
 #
 ## ----------------------------------------- ## 
-def collect( site, location, kafka, device ):
+def collect( site, location, api_url, device ):
 
   arduino = arduinoSerial( device=device )
-  producer = KafkaProducer(bootstrap_servers=[kafka], value_serializer=lambda v: json.dumps(v).encode('ascii'))
 
   print "Starting loop"
   while( True ):
@@ -75,7 +72,9 @@ def collect( site, location, kafka, device ):
      event["site"] = site 
      event["location"] = location 
      
-     producer.send('environment', event)
+     r = requests.post(url = api_url, data = event) 
+ 
+     print(r.text)
 
      time.sleep (5)
 
