@@ -23,12 +23,22 @@ $ sudo apt-get update
 
 $ sudo apt-get install -y docker-ce
 
-$ sudo usermod -aG docker pi
+$ sudo usermod -aG docker $USER
 ```
 
 # Launch the weather docker
 ```
 $ echo "LOCATION=Bedroom" >> ~/.bashrc
+$ echo "SITE=pad" >> ~/.bashrc
 $ . ./.bashrc
-$ docker run -d --restart always --name weather -v /dev/:/host/ -e LOCATION=$LOCATION -e DEVICE=/host/ttyACM0 -e API_URL=http://environment.the-collective-group.com -e SITE=$SITE --privileged eventngine/environment:arm-0.0.2 
+$ docker run -d \
+     --restart always \
+     --name weather \
+     -v /dev/:/host/ \
+     -e LOCATION=$LOCATION \
+     -e SITE=$SITE \
+     -e DEVICE=/host/ttyACM0 \
+     -e API_URL=http://environment.the-collective-group.com \
+     --privileged \
+     eventngine/environment:arm-0.0.2
 ```
