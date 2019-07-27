@@ -69,6 +69,14 @@ def collect( site, location, api_url, device ):
        print "ERROR: " + str( event['weather']["status"] )
        continue
 
+     data['command'] = 'getVoc'
+     arduino.write(json.dumps(data))
+
+     event['voc'] = json.loads(arduino.read())
+     if event['voc']["status"] != "OK":
+       print "ERROR: " + str( event['voc']["status"] )
+       continue
+
      event["site"] = site 
      event["location"] = location 
      

@@ -1,6 +1,7 @@
 //---- WeatherSketch --------------------//
 #include "weatherStation.h"
 #include "particleSensor.h"
+#include "voc.h"
 #include <ArduinoJson.h>
 
 
@@ -12,6 +13,8 @@ void setup() {
 void loop() {
   weatherStation *theWeatherStation = new weatherStation();
   particleSensor *theParticleSensor = new particleSensor();
+  voc *theVoc = new voc();
+  
   String data = "";
   String status = "off";
   digitalWrite(LED_BUILTIN, LOW);
@@ -29,6 +32,8 @@ void loop() {
        JsonObject& json = jsonBuffer.parseObject(data);
 
        String command = json["command"];
+
+       // ** getWeather **
        if ( command == "getWeather" )
        {
           digitalWrite(LED_BUILTIN, HIGH);
@@ -50,6 +55,7 @@ void loop() {
           Serial.println();
        }
 
+       // ** getParticles **
        else if ( command == "getParticles" )
        {
          digitalWrite(LED_BUILTIN, HIGH);
@@ -65,8 +71,22 @@ void loop() {
 
          reply.printTo(Serial);
          Serial.println();
-         }
-       
+       }
+
+       // ** getVoc **
+       else if ( command == "getVoc" )
+       {
+         JsonObject& reply = jsonBuffer.createObject(); 
+         
+         reply["CO2"] = double_with_n_digits( theVoc->getCO2(), 4);
+         reply["TVOC"] = double_with_n_digits( theVoc->getTVOC(), 4);
+         reply["status"] = "OK";
+
+         reply.printTo(Serial);
+         Serial.println();
+       }
+
+       // ** else **
        else
        {
          JsonObject& reply = jsonBuffer.createObject();
