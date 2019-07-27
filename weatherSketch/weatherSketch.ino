@@ -78,6 +78,9 @@ void loop() {
        {
          JsonObject& reply = jsonBuffer.createObject(); 
          
+         theVoc->setSensorHumidity( theWeatherStation->getHumidity(), theWeatherStation->getTemp() );
+         theVoc->measure();
+         
          reply["CO2"] = double_with_n_digits( theVoc->getCO2(), 4);
          reply["TVOC"] = double_with_n_digits( theVoc->getTVOC(), 4);
          reply["status"] = "OK";
