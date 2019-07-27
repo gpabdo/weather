@@ -2,7 +2,7 @@ FROM python:2.7
 
 ENV SITE='unkown'
 ENV LOCATION='unknown'
-ENV KAFKA='kafka.pad.the-collective-group.com:9092'
+ENV API_URL='http://environment.the-collective-group.com' 
 ENV DEVICE='/host/ttyUSB0'
 
 COPY ./environment/requirements.txt /tmp/
