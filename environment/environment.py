@@ -44,6 +44,13 @@ def main(argv):
 #
 ## ----------------------------------------- ## 
 def collect( site, location, api_url, device ):
+ 
+  print "Init:"
+  print "SITE: " + site
+  print "LOCATION: " + location
+  print "DEVICE: " + device
+  print "API_URL: " + api_url
+
 
   arduino = arduinoSerial( device=device )
 
@@ -53,6 +60,7 @@ def collect( site, location, api_url, device ):
      data = {}
      event = {}
 
+     # Get particle data
      data['command'] = 'getParticles'
      arduino.write(json.dumps(data))
     
@@ -61,6 +69,8 @@ def collect( site, location, api_url, device ):
        print "ERROR: " + str( event['pm']["status"] )
        continue 
 
+
+     # Get weather data
      data['command'] = 'getWeather'
      arduino.write(json.dumps(data))
 
@@ -69,6 +79,8 @@ def collect( site, location, api_url, device ):
        print "ERROR: " + str( event['weather']["status"] )
        continue
 
+
+     # Get VOC data
      data['command'] = 'getVoc'
      arduino.write(json.dumps(data))
 
@@ -77,10 +89,14 @@ def collect( site, location, api_url, device ):
        print "ERROR: " + str( event['voc']["status"] )
        continue
 
+
+     # Add location data
      event["site"] = site 
      event["location"] = location 
-     
-     r = requests.post(url = api_url, data = event) 
+
+     # Send data
+     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+     r = requests.post(url = api_url, json = event, headers=headers ) 
  
      print(r.text)
 

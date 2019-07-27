@@ -1,5 +1,6 @@
 # Build
 ```
+# Be sure to build on an ARM device
 $ docker build -t eventngine/environment:arm-0.0.2 .
 $ docker push eventngine/environment:arm-0.0.2
 ```
