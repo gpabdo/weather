@@ -9,4 +9,4 @@ List of parts:
 [1 x Qwiic Shiled](https://www.sparkfun.com/products/14352)  
 [1 x Air Quality Sensor](https://www.adafruit.com/product/3686)  
 [1 x VOC sensor](https://www.sparkfun.com/products/14813)  
-[Qwiic cable](https://www.sparkfun.com/products/14429)  
+[1 x Qwiic cable](https://www.sparkfun.com/products/14429)  
