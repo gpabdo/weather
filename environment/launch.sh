@@ -1,0 +1,17 @@
+#!/bin/bash
+
+echo "Location set to: "$LOCATION
+echo "Site set to: " $SITE
+
+source ~/.bashrc
+
+docker run -d \
+     --restart always \
+     --name weather \
+     -v /dev/:/host/ \
+     -e LOCATION=$LOCATION \
+     -e SITE=$SITE \
+     -e DEVICE=/host/ttyACM0 \
+     -e API_URL=http://environment.the-collective-group.com \
+     --privileged \
+     eventngine/environment:arm-0.0.4
