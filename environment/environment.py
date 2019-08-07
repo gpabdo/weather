@@ -67,7 +67,7 @@ def collect( site, location, api_url, device ):
      event['pm'] = json.loads(arduino.read())
      if event['pm']["status"] != "OK":
        print "ERROR: " + str( event['pm']["status"] )
-       continue 
+       continue
 
 
      # Get weather data
