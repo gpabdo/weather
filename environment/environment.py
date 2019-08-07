@@ -67,7 +67,6 @@ def collect( site, location, api_url, device ):
      event['pm'] = json.loads(arduino.read())
      if event['pm']["status"] != "OK":
        print "ERROR: " + str( event['pm']["status"] )
-     elif event['pm']["status"] != "UNKOWN_COMMAND":
        continue
 
 
@@ -78,7 +77,6 @@ def collect( site, location, api_url, device ):
      event['weather'] = json.loads(arduino.read())
      if event['weather']["status"] != "OK":
        print "ERROR: " + str( event['weather']["status"] )
-     elif event['weather']["status"] != "UNKOWN_COMMAND":
        continue
 
 
@@ -89,7 +87,6 @@ def collect( site, location, api_url, device ):
      event['voc'] = json.loads(arduino.read())
      if event['voc']["status"] != "OK":
        print "ERROR: " + str( event['voc']["status"] )
-     elif event['voc']["status"] != "UNKOWN_COMMAND":
        continue
 
 
