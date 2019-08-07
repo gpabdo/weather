@@ -6,11 +6,23 @@
 voc::voc()
 {
   Wire.begin();
+  deviceConnected = false;
   
   //Initialize sensor
-  if (mySensor.begin() == true) {
-    mySensor.initAirQuality();
+  if (mySensor.begin() == false) {
+    return;
   }
+  
+  mySensor.initAirQuality();
+  deviceConnected = true;
+}
+
+
+//**** isConnected() **************************************//
+//
+//*********************************************************//
+bool voc::isConnected(){
+  return deviceConnected;
 }
 
 

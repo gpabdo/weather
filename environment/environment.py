@@ -67,7 +67,6 @@ def collect( site, location, api_url, device ):
      event['pm'] = json.loads(arduino.read())
      if event['pm']["status"] != "OK":
        print "ERROR: " + str( event['pm']["status"] )
-       continue 
 
 
      # Get weather data
@@ -77,7 +76,6 @@ def collect( site, location, api_url, device ):
      event['weather'] = json.loads(arduino.read())
      if event['weather']["status"] != "OK":
        print "ERROR: " + str( event['weather']["status"] )
-       continue
 
 
      # Get VOC data
@@ -87,7 +85,6 @@ def collect( site, location, api_url, device ):
      event['voc'] = json.loads(arduino.read())
      if event['voc']["status"] != "OK":
        print "ERROR: " + str( event['voc']["status"] )
-       continue
 
 
      # Add location data

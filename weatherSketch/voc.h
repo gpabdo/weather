@@ -10,12 +10,14 @@ class voc
   public:
     voc();
     bool measure();
+    bool isConnected();
     void setSensorHumidity( float, float );
     float getCO2();
     float getTVOC();
     
   private:
     SGP30 mySensor;
+    bool deviceConnected;
     uint16_t doubleToFixedPoint( double );
     double RHtoAbsolute (float, float ); 
      

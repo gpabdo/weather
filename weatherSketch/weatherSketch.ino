@@ -77,14 +77,20 @@ void loop() {
        else if ( command == "getVoc" )
        {
          JsonObject& reply = jsonBuffer.createObject(); 
-         
-         theVoc->setSensorHumidity( theWeatherStation->getHumidity(), theWeatherStation->getTemp() );
-         theVoc->measure();
-         
-         reply["CO2"] = double_with_n_digits( theVoc->getCO2(), 4);
-         reply["TVOC"] = double_with_n_digits( theVoc->getTVOC(), 4);
-         reply["status"] = "OK";
 
+         if ( !theVoc->isConnected() ) {
+           reply["status"] = "NOT_DETECTED";
+         }
+         else 
+         { 
+           theVoc->setSensorHumidity( theWeatherStation->getHumidity(), theWeatherStation->getTemp() );
+           theVoc->measure();
+         
+           reply["CO2"] = double_with_n_digits( theVoc->getCO2(), 4);
+           reply["TVOC"] = double_with_n_digits( theVoc->getTVOC(), 4);
+           reply["status"] = "OK";
+         }
+         
          reply.printTo(Serial);
          Serial.println();
        }
