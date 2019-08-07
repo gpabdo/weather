@@ -79,7 +79,7 @@ void loop() {
          JsonObject& reply = jsonBuffer.createObject(); 
 
          if ( !theVoc->isConnected() ) {
-           reply["status"] = "NOT_DETECTED";
+           reply["status"] = "VOC_NOT_DETECTED";
          }
          else 
          { 
