@@ -92,7 +92,7 @@ void loop() {
          }
          
          reply.printTo(Serial);
-         Serial.println();
+         Serial.println(); 
        }
 
        // ** else **
@@ -106,5 +106,3 @@ void loop() {
     }
   }
 }
-
-

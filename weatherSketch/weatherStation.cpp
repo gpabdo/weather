@@ -53,8 +53,8 @@ void weatherStation::rainIRQ()
 {
   long currentRainIRQ = millis();
 
-  // ignore switch-bounce glitches less than 100mS after initial edge
-  if (currentRainIRQ - lastRainIRQ > 100)  
+  // ignore switch-bounce glitches less than 2 seconds after initial edge
+  if (currentRainIRQ - lastRainIRQ > 2000)  
   {
     rainLevel += 0.011;                   //Each dump is 0.011" of water
     lastRainIRQ = millis();
@@ -241,4 +241,3 @@ int weatherStation::averageAnalogRead(int pinToRead)
 
   return(runningValue);
 }
-

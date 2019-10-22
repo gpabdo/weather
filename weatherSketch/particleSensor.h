@@ -1,8 +1,8 @@
 #ifndef ParticleSensor_h
 #define ParticleSensor_h
 
-#define SENSOR_RX_PIN 2
-#define SENSOR_TX_PIN 3
+#define SENSOR_RX_PIN 4
+#define SENSOR_TX_PIN 5
 
 #include <SoftwareSerial.h>
 
