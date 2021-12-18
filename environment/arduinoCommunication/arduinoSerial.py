@@ -16,8 +16,8 @@ class arduinoSerial:
 
     def write(self, message):
         if self.isConnected():
-            self.arduino.write(message)
-            self.arduino.write('\n')
+            self.arduino.write( str.encode(message))
+            self.arduino.write( str.encode('\n'))
         else:
             return 0 
 
