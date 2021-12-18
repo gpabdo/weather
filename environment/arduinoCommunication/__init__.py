@@ -1,1 +1,1 @@
-from arduinoSerial import arduinoSerial
+from . import arduinoSerial
