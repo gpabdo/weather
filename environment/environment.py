@@ -11,9 +11,9 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from arduinoCommunication import arduinoSerial
 
 
-token = "mXsXRVbnQUbrJ6rJmIFlY3NaI8JZneJTmXN_sZxVW5qkDuyKgwzTyn-L-TDU0tDOW0C0M9kJyUXazT6F3c8law=="
+token = "YANPqMm_P2zA0GMMxwH-uj-pSOAlpq5Ylx2jmeqZnOi8X2PppAxp5ir454N3C1k-6j2S6q0z9z5cXTjFMEdxcQ=="
 org = "weather"
-bucket = "weather"
+bucket = "Environment"
 
 ## ----------------------------------------- ##
 #
@@ -60,7 +60,7 @@ def collect( site, location, api_url, device ):
 
   arduinoDevice = arduinoSerial.arduinoSerial( device=device )
 
-  print("Starting loop")
+  print("Starting stupid loop")
 
   with InfluxDBClient(url=api_url, token=token, org=org, ssl=False, verify_ssl=False ) as client:
     write_api = client.write_api(write_options=SYNCHRONOUS)
@@ -70,15 +70,6 @@ def collect( site, location, api_url, device ):
       data = {}
       event = {}
 
-      # Get particle data
-      data['command'] = 'getParticles'
-      arduinoDevice.write(json.dumps(data))
-    
-      event['pm'] = json.loads(arduinoDevice.read())
-      if event['pm']["status"] != "OK":
-        print("ERROR: " + str( event['pm']["status"] ))
-        continue
-
       # Get weather data
       data['command'] = 'getWeather'
       arduinoDevice.write(json.dumps(data))
@@ -87,6 +78,18 @@ def collect( site, location, api_url, device ):
       if event['weather']["status"] != "OK":
         print("ERROR: " + str( event['weather']["status"] ))
         continue
+      print("Got the weather")
+
+
+      # Get particle data
+#      data['command'] = 'getParticles'
+#      arduinoDevice.write(json.dumps(data))
+
+#      event['pm'] = json.loads(arduinoDevice.read())
+#      if event['pm']["status"] != "OK":
+#        print("ERROR: " + str( event['pm']["status"] ))
+#        continue
+#      print("Got the particles")
 
 
       # Get VOC data
@@ -97,30 +100,32 @@ def collect( site, location, api_url, device ):
       if event['voc']["status"] != "OK":
         print("ERROR: " + str( event['voc']["status"] ))
         continue
+      print("Got the VOCs")
 
-      point = Point("environment") \
+
+      point = Point("Environment") \
         .tag("Site", site) \
         .tag("Location", location) \
-        .field("Temp", event['weather']['temp'] ) \
-        .field("WindSpeed", event['weather']['windSpeed'] ) \
+        .field("Temp", float(event['weather']['temp'] )) \
+        .field("WindSpeed", float(event['weather']['windSpeed'] )) \
         .field("WindDir", event['weather']['windDir'] ) \
-        .field("Rain", event['weather']['rain'] ) \
-        .field("Humidity", event['weather']['humidity'] ) \
-        .field("Pressure", event['weather']['pressure'] ) \
+        .field("Rain", float(event['weather']['rain'] )) \
+        .field("Humidity", float(event['weather']['humidity'] )) \
+        .field("Pressure", float(event['weather']['pressure'] )) \
+        .field("CO2", event['voc']['CO2'] ) \
+        .field("TOVC", event['voc']['TVOC'] ) \
         .field("Particles_03um", event['pm']['PM_0.3'] ) \
         .field("Particles_05um", event['pm']['PM_0.5'] ) \
         .field("Particles_10um", event['pm']['PM_1.0'] ) \
         .field("Particles_25um", event['pm']['PM_2.5'] ) \
         .field("Particles_50um", event['pm']['PM_5.0'] ) \
         .field("Particles_100um", event['pm']['PM_10.0'] ) \
-        .field("CO2", event['voc']['CO2'] ) \
-        .field("TOVC", event['voc']['TVOC'] ) \
         .time(datetime.utcnow(), WritePrecision.NS)
 
 
       write_api.write( bucket=bucket, record=point)
+      print( point )
       time.sleep (5)
-
 
 ## ----------------------------------------- ##
 #

@@ -2,7 +2,6 @@
 #define voc_h
 
 #include <SparkFun_SGP30_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
-#include <Wire.h>
 
 class voc
 {

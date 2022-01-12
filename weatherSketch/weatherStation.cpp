@@ -12,7 +12,7 @@ volatile unsigned long weatherStation::lastRainIRQ = 0;
 //*********************************************************//
 weatherStation::weatherStation()
 {
-
+  Wire.begin();
   pinMode(WSPEED, INPUT_PULLUP);      // input from wind meters windspeed sensor
   pinMode(RAIN, INPUT_PULLUP);        // input from wind meters rain gauge sensor
 
@@ -164,7 +164,8 @@ int weatherStation::getWindDirection()
 //*********************************************************//
 float weatherStation::getHumidity()
 {
-    return( myHumidity.readHumidity() );
+    //return( myHumidity.readHumidity() );
+    return( myHumidity.getRH() );
 }
 
 

@@ -1,19 +1,20 @@
 //---- WeatherSketch --------------------//
 #include "weatherStation.h"
-#include "particleSensor.h"
-#include "voc.h"
+//#include "particleSensor.h"
+//#include "voc.h"
 #include <ArduinoJson.h>
-
+//#include <Wire.h> //I2C needed for sensors
 
 void setup() {
+    //Wire.begin();
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.begin(57600);
 }
 
 void loop() {
   weatherStation *theWeatherStation = new weatherStation();
-  particleSensor *theParticleSensor = new particleSensor();
-  voc *theVoc = new voc();
+//  particleSensor *theParticleSensor = new particleSensor();
+//  voc *theVoc = new voc();
   
   String data = "";
   String status = "off";
@@ -21,7 +22,6 @@ void loop() {
 
   while( true )
   {
-    theParticleSensor->load();
     
     // If there is datai n the buffer.
     if( Serial.available() )
@@ -56,18 +56,22 @@ void loop() {
        }
 
        // ** getParticles **
-       else if ( command == "getParticles" )
+/*       else if ( command == "getParticles" )
        {
          digitalWrite(LED_BUILTIN, HIGH);
          JsonObject& reply = jsonBuffer.createObject(); 
 
-         reply["PM_0.3"] = double_with_n_digits( theParticleSensor->get03(), 4);
-         reply["PM_0.5"] = double_with_n_digits( theParticleSensor->get05(), 4);
-         reply["PM_1.0"] = double_with_n_digits( theParticleSensor->get10(), 4);
-         reply["PM_2.5"] = double_with_n_digits( theParticleSensor->get25(), 4);
-         reply["PM_5.0"] = double_with_n_digits( theParticleSensor->get50(), 4);
-         reply["PM_10.0"] = double_with_n_digits( theParticleSensor->get100(), 4);
-         reply["status"] = "OK";
+         reply["status"] = "FAIL";
+
+         if( theParticleSensor->load() ){
+           reply["PM_0.3"] = double_with_n_digits( theParticleSensor->get03(), 4);
+           reply["PM_0.5"] = double_with_n_digits( theParticleSensor->get05(), 4);
+           reply["PM_1.0"] = double_with_n_digits( theParticleSensor->get10(), 4);
+           reply["PM_2.5"] = double_with_n_digits( theParticleSensor->get25(), 4);
+           reply["PM_5.0"] = double_with_n_digits( theParticleSensor->get50(), 4);
+           reply["PM_10.0"] = double_with_n_digits( theParticleSensor->get100(), 4);
+           reply["status"] = "OK";
+         }
 
          reply.printTo(Serial);
          Serial.println();
@@ -93,7 +97,7 @@ void loop() {
          
          reply.printTo(Serial);
          Serial.println();
-       }
+       }*/
 
        // ** else **
        else

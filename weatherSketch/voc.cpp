@@ -5,7 +5,6 @@
 //*********************************************************//
 voc::voc()
 {
-  Wire.begin();
   deviceConnected = false;
   
   //Initialize sensor
