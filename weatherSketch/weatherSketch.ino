@@ -1,20 +1,18 @@
 //---- WeatherSketch --------------------//
 #include "weatherStation.h"
-//#include "particleSensor.h"
-//#include "voc.h"
+#include "particleSensor.h"
+#include "voc.h"
 #include <ArduinoJson.h>
-//#include <Wire.h> //I2C needed for sensors
 
 void setup() {
-    //Wire.begin();
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.begin(57600);
 }
 
 void loop() {
   weatherStation *theWeatherStation = new weatherStation();
-//  particleSensor *theParticleSensor = new particleSensor();
-//  voc *theVoc = new voc();
+  particleSensor *theParticleSensor = new particleSensor();
+  voc *theVoc = new voc();
   
   String data = "";
   String status = "off";
@@ -56,7 +54,7 @@ void loop() {
        }
 
        // ** getParticles **
-/*       else if ( command == "getParticles" )
+       else if ( command == "getParticles" )
        {
          digitalWrite(LED_BUILTIN, HIGH);
          JsonObject& reply = jsonBuffer.createObject(); 
@@ -97,7 +95,7 @@ void loop() {
          
          reply.printTo(Serial);
          Serial.println();
-       }*/
+       }
 
        // ** else **
        else
@@ -110,5 +108,3 @@ void loop() {
     }
   }
 }
-
-

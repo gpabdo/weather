@@ -1,7 +1,7 @@
 #ifndef WeatherStation_h
 #define WeatherStation_h
 
-#include <avr/wdt.h>                //We need watch dog for this program
+//#include <avr/wdt.h>                //We need watch dog for this program
 #include <Wire.h>                   //I2C needed for sensors
 //#include <SparkFunMPL3115A2.h>      //Pressure sensor
 #include "SparkFunMPL3115A2.h"      //Pressure sensor
@@ -54,4 +54,3 @@ class weatherStation
 };
 
 #endif
-
