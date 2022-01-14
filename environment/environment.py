@@ -10,8 +10,6 @@ from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 from arduinoCommunication import arduinoSerial
 
-
-token = "YANPqMm_P2zA0GMMxwH-uj-pSOAlpq5Ylx2jmeqZnOi8X2PppAxp5ir454N3C1k-6j2S6q0z9z5cXTjFMEdxcQ=="
 org = "weather"
 bucket = "Environment"
 
@@ -43,8 +41,14 @@ def main(argv):
            print("Please set the environment variable DEVICE")
            sys.exit(1)
 
+
+    try:
+           token = os.environ["TOKEN"]
+    except KeyError:
+           print("Please set the environment variable TOKEN")
+           sys.exit(1)
     
-    collect( site=site, location=location, api_url=api_url, device=device )
+    collect( site=site, location=location, api_url=api_url, device=device, token=token )
 
 
 ## ----------------------------------------- ## 
@@ -64,6 +68,10 @@ def collect( site, location, api_url, device ):
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
     print(str( datetime.now() ) + " [INFO] : Starting stupid loop")
+
+    #
+    # loop
+    #
     while( True ):
 
       while( arduinoDevice.isAvalible() ):
@@ -72,7 +80,9 @@ def collect( site, location, api_url, device ):
       data = {}
       event = {}
 
+      #
       # Get weather data
+      #
       data['command'] = 'getWeather'
       arduinoDevice.write(json.dumps(data))
 
@@ -82,11 +92,12 @@ def collect( site, location, api_url, device ):
           print(str( datetime.now() ) + " [ERROR] : " + str( event['weather']["status"] ))
           continue
       except:
-        print(str( datetime.now() ) + " [ERROR] : reading getWeather json")
+        print(str( datetime.now() ) + " [ERROR] : reading getWeather json" )
         break
 
-
+      #
       # Get particle data
+      #
       data['command'] = 'getParticles'
       arduinoDevice.write(json.dumps(data))
 
@@ -96,10 +107,12 @@ def collect( site, location, api_url, device ):
           print(str( datetime.now() ) + " [ERROR] : " + str( event['pm']["status"] ))
           continue
       except:
-        print(str( datetime.now() ) +  " [ERROR] : reading getWeather json")
+        print(str( datetime.now() ) +  " [ERROR] : reading getWeather json" )
         break
 
+      #
       # Get VOC data
+      #
       data['command'] = 'getVoc'
       arduinoDevice.write(json.dumps(data))
 
@@ -109,13 +122,20 @@ def collect( site, location, api_url, device ):
           print(str( datetime.now() ) + " [ERROR] : " + str( event['voc']["status"] ))
           continue
       except:
-        print(str( datetime.now() ) + " [ERROR] : reading getVoc json")
+        print(str( datetime.now() ) + " [ERROR] : reading getVoc json" )
         break
 
+      #
+      # Create the point
+      #
       point = Point("Environment") \
         .tag("Site", site) \
-        .tag("Location", location)
+        .tag("Location", location) \
+        .time(datetime.utcnow(), WritePrecision.NS)
 
+      #
+      # Add weather
+      #
       if 'weather' in event.keys():
         try: 
           point.field("Temp", float(event['weather']['temp'] ))
@@ -126,15 +146,21 @@ def collect( site, location, api_url, device ):
           point.field("Humidity", float(event['weather']['humidity'] ))
           point.field("Pressure", float(event['weather']['pressure'] ))
         except:
-          print(str( datetime.now() ) + " [ERROR] : Couldn't add weather: " + str( event ) )
+          print(str( datetime.now() ) + " [ERROR] : Couldn't add weather: " )
 
+      #
+      # Add voc
+      #
       if 'voc' in event.keys():
         try:
           point.field("CO2", event['voc']['CO2'] )
           point.field("TOVC", event['voc']['TVOC'] )
         except:
-          print( str( datetime.now() ) +  " [ERROR] : Couldn't add voc: " + str( event ) )
+          print( str( datetime.now() ) +  " [ERROR] : Couldn't add voc: " )
 
+      #
+      # Add PM
+      #
       if 'pm' in event.keys():
         try:
           point.field("Particles_03um", event['pm']['PM_0.3'] )
@@ -144,12 +170,20 @@ def collect( site, location, api_url, device ):
           point.field("Particles_50um", event['pm']['PM_5.0'] )
           point.field("Particles_100um", event['pm']['PM_10.0'] )
         except:
-          print( str( datetime.now() ) +  " [ERROR] : Couldn't add pm: " + str( event ) )        
+          print( str( datetime.now() ) +  " [ERROR] : Couldn't add pm:" )        
 
-      point.time(datetime.utcnow(), WritePrecision.NS)
+      #
+      # Ship it
+      #
+      try:
+        write_api.write( bucket=bucket, record=point)
+        print( str( datetime.now() ) +  " [INFO] : Point written")
+      except:
+        print( str( datetime.now() ) +  " [ERROR] : Couldn't write the point" )
 
-      write_api.write( bucket=bucket, record=point)
-      print( str( datetime.now() ) +  " [INFO] : Point written")
+      #
+      #
+      #
       time.sleep (5)
 
 ## ----------------------------------------- ##
