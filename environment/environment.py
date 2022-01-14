@@ -67,8 +67,7 @@ def collect( site, location, api_url, device ):
     while( True ):
 
       while( arduinoDevice.isAvalible() ):
-        print(str( datetime.now() ) + " [INFO] : Clearing Buffer")
-        print( arduinoDevice.read() )
+        print(str( datetime.now() ) + " [INFO] : Clearing Buffer \'" + str( arduinoDevice.read() ) + "\'" )
 
       data = {}
       event = {}
