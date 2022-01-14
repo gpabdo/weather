@@ -21,6 +21,10 @@ class arduinoSerial:
         else:
             return 0 
 
+    def isAvalible(self):
+        return self.arduino.in_waiting
+
+
     def read(self):
         if self.isConnected():
             return self.arduino.readline()

@@ -60,13 +60,15 @@ def collect( site, location, api_url, device ):
 
   arduinoDevice = arduinoSerial.arduinoSerial( device=device )
 
-  print( arduinoDevice.read() )
-
   with InfluxDBClient(url=api_url, token=token, org=org, ssl=False, verify_ssl=False ) as client:
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
     print("Starting stupid loop")
     while( True ):
+
+      while( arduinoDevice.isAvalible() ):
+        print("Clearing Buffer")
+        print( arduinoDevice.read() )
 
       data = {}
       event = {}
@@ -82,6 +84,7 @@ def collect( site, location, api_url, device ):
           continue
       except:
         print("Error reading getWeather json")
+        break
 
 
       # Get particle data
@@ -95,6 +98,7 @@ def collect( site, location, api_url, device ):
           continue
       except:
         print("Error reading getWeather json")
+        break
 
       # Get VOC data
       data['command'] = 'getVoc'
@@ -107,6 +111,7 @@ def collect( site, location, api_url, device ):
           continue
       except:
         print("Error reading getVoc json")
+        break
 
       point = Point("Environment") \
         .tag("Site", site) \
