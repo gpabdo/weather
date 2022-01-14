@@ -60,11 +60,12 @@ def collect( site, location, api_url, device ):
 
   arduinoDevice = arduinoSerial.arduinoSerial( device=device )
 
-  print("Starting stupid loop")
+  print( arduinoDevice.read() )
 
   with InfluxDBClient(url=api_url, token=token, org=org, ssl=False, verify_ssl=False ) as client:
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
+    print("Starting stupid loop")
     while( True ):
 
       data = {}
@@ -74,57 +75,76 @@ def collect( site, location, api_url, device ):
       data['command'] = 'getWeather'
       arduinoDevice.write(json.dumps(data))
 
-      event['weather'] = json.loads(arduinoDevice.read())
-      if event['weather']["status"] != "OK":
-        print("ERROR: " + str( event['weather']["status"] ))
-        continue
-      print("Got the weather")
+      try:
+        event['weather'] = json.loads(arduinoDevice.read())
+        if event['weather']["status"] != "OK":
+          print("ERROR: " + str( event['weather']["status"] ))
+          continue
+      except:
+        print("Error reading getWeather json")
 
 
       # Get particle data
-#      data['command'] = 'getParticles'
-#      arduinoDevice.write(json.dumps(data))
+      data['command'] = 'getParticles'
+      arduinoDevice.write(json.dumps(data))
 
-#      event['pm'] = json.loads(arduinoDevice.read())
-#      if event['pm']["status"] != "OK":
-#        print("ERROR: " + str( event['pm']["status"] ))
-#        continue
-#      print("Got the particles")
-
+      try:
+        event['pm'] = json.loads(arduinoDevice.read())
+        if event['pm']["status"] != "OK":
+          print("ERROR: " + str( event['pm']["status"] ))
+          continue
+      except:
+        print("Error reading getWeather json")
 
       # Get VOC data
       data['command'] = 'getVoc'
       arduinoDevice.write(json.dumps(data))
 
-      event['voc'] = json.loads(arduinoDevice.read())
-      if event['voc']["status"] != "OK":
-        print("ERROR: " + str( event['voc']["status"] ))
-        continue
-      print("Got the VOCs")
-
+      try:
+        event['voc'] = json.loads(arduinoDevice.read())
+        if event['voc']["status"] != "OK":
+          print("ERROR: " + str( event['voc']["status"] ))
+          continue
+      except:
+        print("Error reading getVoc json")
 
       point = Point("Environment") \
         .tag("Site", site) \
-        .tag("Location", location) \
-        .field("Temp", float(event['weather']['temp'] )) \
-        .field("WindSpeed", float(event['weather']['windSpeed'] )) \
-        .field("WindDir", event['weather']['windDir'] ) \
-        .field("Rain", float(event['weather']['rain'] )) \
-        .field("Humidity", float(event['weather']['humidity'] )) \
-        .field("Pressure", float(event['weather']['pressure'] )) \
-        .field("CO2", event['voc']['CO2'] ) \
-        .field("TOVC", event['voc']['TVOC'] ) \
-        .field("Particles_03um", event['pm']['PM_0.3'] ) \
-        .field("Particles_05um", event['pm']['PM_0.5'] ) \
-        .field("Particles_10um", event['pm']['PM_1.0'] ) \
-        .field("Particles_25um", event['pm']['PM_2.5'] ) \
-        .field("Particles_50um", event['pm']['PM_5.0'] ) \
-        .field("Particles_100um", event['pm']['PM_10.0'] ) \
-        .time(datetime.utcnow(), WritePrecision.NS)
+        .tag("Location", location)
 
+      if 'weather' in event.keys():
+        try: 
+          point.field("Temp", float(event['weather']['temp'] ))
+          point.field("WindSpeed", float(event['weather']['windSpeed'] )) 
+          point.field("WindDir", event['weather']['windDir'] )
+          point.field("Rain", float(event['weather']['rain'] ))
+          point.field("Humidity", float(event['weather']['humidity'] ))
+          point.field("Pressure", float(event['weather']['pressure'] ))
+        except:
+          print("Error adding weather: " + str( event ) )
+
+      if 'voc' in event.keys():
+        try:
+          point.field("CO2", event['voc']['CO2'] )
+          point.field("TOVC", event['voc']['TVOC'] )
+        except:
+          print("Error adding voc: " + str( event ) )
+
+      if 'pm' in event.keys():
+        try:
+          point.field("Particles_03um", event['pm']['PM_0.3'] )
+          point.field("Particles_05um", event['pm']['PM_0.5'] )
+          point.field("Particles_10um", event['pm']['PM_1.0'] )
+          point.field("Particles_25um", event['pm']['PM_2.5'] )
+          point.field("Particles_50um", event['pm']['PM_5.0'] )
+          point.field("Particles_100um", event['pm']['PM_10.0'] )
+        except:
+          print("Error adding pm: " + str( event ) )        
+
+      point.time(datetime.utcnow(), WritePrecision.NS)
 
       write_api.write( bucket=bucket, record=point)
-      print( point )
+      print( str( datetime.now() ) +  " [INFO] : Point written")
       time.sleep (5)
 
 ## ----------------------------------------- ##

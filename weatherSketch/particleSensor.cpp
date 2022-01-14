@@ -77,7 +77,6 @@ float particleSensor::get100()
 bool particleSensor::load()
 {  
   if (! aqi.read(&data)) {
-    Serial.println("Could not read from AQI");
     return false;
   }
 
