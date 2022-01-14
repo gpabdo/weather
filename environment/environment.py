@@ -122,6 +122,7 @@ def collect( site, location, api_url, device ):
           point.field("Temp", float(event['weather']['temp'] ))
           point.field("WindSpeed", float(event['weather']['windSpeed'] )) 
           point.field("WindDir", event['weather']['windDir'] )
+          point.field("Gust", float(event['weather']['gust'] ))
           point.field("Rain", float(event['weather']['rain'] ))
           point.field("Humidity", float(event['weather']['humidity'] ))
           point.field("Pressure", float(event['weather']['pressure'] ))
