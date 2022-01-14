@@ -54,7 +54,7 @@ def main(argv):
 ## ----------------------------------------- ## 
 #
 ## ----------------------------------------- ## 
-def collect( site, location, api_url, device ):
+def collect( site, location, api_url, device, token ):
  
   print("Init:")
   print("SITE: " + site)
