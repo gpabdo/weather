@@ -63,11 +63,11 @@ def collect( site, location, api_url, device ):
   with InfluxDBClient(url=api_url, token=token, org=org, ssl=False, verify_ssl=False ) as client:
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
-    print("Starting stupid loop")
+    print(str( datetime.now() ) + " [INFO] : Starting stupid loop")
     while( True ):
 
       while( arduinoDevice.isAvalible() ):
-        print("Clearing Buffer")
+        print(str( datetime.now() ) + " [INFO] : Clearing Buffer")
         print( arduinoDevice.read() )
 
       data = {}
@@ -80,10 +80,10 @@ def collect( site, location, api_url, device ):
       try:
         event['weather'] = json.loads(arduinoDevice.read())
         if event['weather']["status"] != "OK":
-          print("ERROR: " + str( event['weather']["status"] ))
+          print(str( datetime.now() ) + " [ERROR] : " + str( event['weather']["status"] ))
           continue
       except:
-        print("Error reading getWeather json")
+        print(str( datetime.now() ) + " [ERROR] : reading getWeather json")
         break
 
 
@@ -94,10 +94,10 @@ def collect( site, location, api_url, device ):
       try:
         event['pm'] = json.loads(arduinoDevice.read())
         if event['pm']["status"] != "OK":
-          print("ERROR: " + str( event['pm']["status"] ))
+          print(str( datetime.now() ) + " [ERROR] : " + str( event['pm']["status"] ))
           continue
       except:
-        print("Error reading getWeather json")
+        print(str( datetime.now() ) +  " [ERROR] : reading getWeather json")
         break
 
       # Get VOC data
@@ -107,10 +107,10 @@ def collect( site, location, api_url, device ):
       try:
         event['voc'] = json.loads(arduinoDevice.read())
         if event['voc']["status"] != "OK":
-          print("ERROR: " + str( event['voc']["status"] ))
+          print(str( datetime.now() ) + " [ERROR] : " + str( event['voc']["status"] ))
           continue
       except:
-        print("Error reading getVoc json")
+        print(str( datetime.now() ) + " [ERROR] : reading getVoc json")
         break
 
       point = Point("Environment") \
@@ -127,14 +127,14 @@ def collect( site, location, api_url, device ):
           point.field("Humidity", float(event['weather']['humidity'] ))
           point.field("Pressure", float(event['weather']['pressure'] ))
         except:
-          print("Error adding weather: " + str( event ) )
+          print(str( datetime.now() ) + " [ERROR] : Couldn't add weather: " + str( event ) )
 
       if 'voc' in event.keys():
         try:
           point.field("CO2", event['voc']['CO2'] )
           point.field("TOVC", event['voc']['TVOC'] )
         except:
-          print("Error adding voc: " + str( event ) )
+          print( str( datetime.now() ) +  " [ERROR] : Couldn't add voc: " + str( event ) )
 
       if 'pm' in event.keys():
         try:
@@ -145,7 +145,7 @@ def collect( site, location, api_url, device ):
           point.field("Particles_50um", event['pm']['PM_5.0'] )
           point.field("Particles_100um", event['pm']['PM_10.0'] )
         except:
-          print("Error adding pm: " + str( event ) )        
+          print( str( datetime.now() ) +  " [ERROR] : Couldn't add pm: " + str( event ) )        
 
       point.time(datetime.utcnow(), WritePrecision.NS)
 
